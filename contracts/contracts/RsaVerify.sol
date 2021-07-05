@@ -1,6 +1,6 @@
-pragma solidity ^0.6.0;
+pragma solidity 0.5.1;
 
-library SolRsaVerify {
+library RsaVerify {
     function memcpy(
         uint256 _dest,
         uint256 _src,
@@ -56,13 +56,20 @@ library SolRsaVerify {
         return input;
     }
 
-    // EM = 0x00 || 0x01 || PS || 0x00 || T
+     /** @dev Verifies a PKCSv1.5 SHA256 signature
+      * @param _data is the sign of the data
+      * @param _s is the signature
+      * @param _e is the exponent
+      * @param _n is the public key modulus
+      * @return 0 if success, >0 otherwise
+    */  
     function VerifyPKCS1v15(
-        bytes32 _sha256,
+        bytes memory _data,
         bytes memory _s,
         bytes memory _e,
         bytes memory _n
     ) public view returns (uint256) {
+        bytes32 _sha256 = sha256(_data);
         uint8[19] memory sha256HashPrefix = [
             0x30,
             0x31,
@@ -97,7 +104,7 @@ library SolRsaVerify {
 
         bytes memory input = join(_s, _e, _n);
         uint256 inputLen = input.length;
-
+          // EM = 0x00 || 0x01 || PS || 0x00 || T
         uint256 emLen = _n.length;
         bytes memory em = new bytes(emLen);
 
@@ -121,24 +128,24 @@ library SolRsaVerify {
         // Check hashed data
         for (i = 0; i < sha256HashLen; i++) {
             if ((em[k - sha256HashLen + i]) != _sha256[i]) {
-                return 3;
+                return 2;
             }
         }
         // Check sha256Hash prefix
         for (i = 0; i < sha256HashPrefix.length; i++) {
             // return k - tLen + i;
             if (uint8(em[k - tLen + i]) != sha256HashPrefix[i]) {
-                return 4;
+                return 3;
             }
         }
         // Check 4 byte is 0x00
         if (em[k - tLen - 1] != 0) {
-            return 5;
+            return 4;
         }
         // padding
         for (i = 2; i < k - tLen - 1; i++) {
             if (em[i] != 0xff) {
-                return 6;
+                return 5;
             }
         }
 
