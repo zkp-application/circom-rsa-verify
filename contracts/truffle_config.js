@@ -1,4 +1,3 @@
-  
 module.exports = {
     /**
      * Networks define how you connect to your ethereum client and let you set the
@@ -56,7 +55,7 @@ module.exports = {
       // }
     },
   
-    // Set default mocha options here, use special reporters etc.
+    // Set default mocha options` here, use special reporters etc.
     mocha: {
       timeout: 100000
     },
