@@ -1,5 +1,5 @@
 include "../circom-bigint/circomlib/circuits/bitify.circom"
-include "../circom-bigint/circuits/bigint.circom"
+include "../circom-bigint/circuits/mult.circom"
 // w = 32
 // base ** exp mod modulus
 // nb is the length of the input number
@@ -15,13 +15,13 @@ template PowerModv2(w, nb, e_bits) {
     component muls[e_bits + 2];
     for (var i = 0; i < e_bits + 2; i++) {
         muls[i] = MultiplierReducer(w, nb);
-        // modules params
+        // modulus params
         for (var j = 0; j < nb; j++) {
             muls[i].modulus[j] <-- modulus[j];
         }
     }
 
-     // // result/base muls component index
+    // result/base muls component index
     var result_index=0;
     var base_index=0;
     var muls_index=0;
@@ -31,7 +31,7 @@ template PowerModv2(w, nb, e_bits) {
                for(var j = 0; j < nb; j ++) {
                     if (j == 0) {
                         muls[muls_index].a[j] <-- 1;
-                    }else {
+                    } else {
                         muls[muls_index].a[j] <-- 0;
                     }
                     muls[muls_index].b[j] <-- base[j];
@@ -46,7 +46,6 @@ template PowerModv2(w, nb, e_bits) {
             muls_index++;
         }
 
-        // ---------------------------------------
         if (base_index == 0) {
              for (var j = 0; j < nb; j++) {
                  muls[muls_index].a[j] <-- base[j];

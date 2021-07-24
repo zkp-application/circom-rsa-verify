@@ -7,13 +7,14 @@
         "test": "test"
     },
     "scripts": {
-        "test": "mocha --max-old-space-size=16000 -t 1000s"
+        "test": "mocha --max-old-space-size=16000 -t 10000s"
     },
     "keywords": [
         "circuit",
         "circom",
         "zksnark",
-        "bigint"
+        "bigint",
+        "rsa"
     ],
     "repository": {
         "type": "git",
@@ -22,12 +23,15 @@
     "author": "jacksoom",
     "license": "GPL-3.0",
     "dependencies": {
-        "circom": "^0.5.45"
+        "circom": "^0.5.45",
+        "node-rsa": "^1.1.1",
+        "npm": "^7.20.1",
+        "test": "^0.6.0"
     },
     "devDependencies": {
-        "circom": "alex-ozdemir/circom#a5215f6",
         "chai": "^4.1.0",
+        "circom": "alex-ozdemir/circom#a5215f6",
         "mocha": "^5.2.0",
-        "snarkjs": "^0.1.11"
+        "snarkjs": "0.1.16"
     }
 }
