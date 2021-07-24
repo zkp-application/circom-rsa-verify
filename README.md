@@ -1,6 +1,6 @@
 # circom-rsa-verify
-This repository contains an implementation of a Zero Knowledge Proof for RSA signature verify for the circom language
-
+This repository contains an implementation of a Zero Knowledge Proof for RSA signature verify for the circom language.
+Currently supported pkcs1v15 + sha256 and exponent is 65537
 # Getting started
 Running circuits test cases
 ```sh
