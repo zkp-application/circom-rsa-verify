@@ -18,18 +18,19 @@ template Montgomery(w, nb) {
 
     var temp = 0;
     var carry = 0;
-
+    // 0b1111111111111111111111111111111111111111111111111111111111111111
+    var lo_64_bit_var = 18446744073709551615;
     for (var i = 0; i< nb; i++) {
         for (var j = 0; j < nb; j++) {
             temp = temps[j] + x[j] * y[i] + carry;
             // t[j], carry = lo_bits, hi_bits
-            temps[j] = loBitsNum(temp, 64);
+            temps[j] = temp & lo_64_bit_var;
             carry = temp >> 64;
         }
 
         temp = temps[nb] + carry;
 
-        temps[nb] = loBitsNum(temp, 64);
+        temps[nb] = temp & lo_64_bit_var;
         temps[nb + 1] = temp >> 64;
 
         var m = (temps[0] * monty_prime[0]) % (2 << 63);
@@ -37,31 +38,17 @@ template Montgomery(w, nb) {
 
         for (var k = 1; k < nb; k++) {
             temp = temps[k] + m * modulus[k] + carry;
-            temps[k - 1] = loBitsNum(temp, 64);
+            temps[k - 1] = temp & lo_64_bit_var;
             carry = temp >> 64;
         }
 
         temp = temps[nb] + carry;
 
-        temps[nb - 1] = loBitsNum(temp, 64);
+        temps[nb - 1] = temp & lo_64_bit_var;
         temps[nb] = temp >> 64 + temps[nb + 1];
     }
 
     for (var i = 0; i < nb + 1; i++) {
         temps[i] --> out[i];
     }
-}
-
-function loBitsNum(num, n) {
-    var e2 = 1;
-    var res = 0;
-    for (var i = 0; i< n; i++) {
-        if (((num >> i) & 1) == 1) {
-            res += e2;
-        }
-
-        e2 = e2 + e2;
-    }
-
-    return res;
 }
