@@ -1,3 +1,3 @@
 include "../../circuits/montgomery_reduction.circom"
 
-component main = Montgomery(64, 8);
+component main = Montgomery(64, 32);
