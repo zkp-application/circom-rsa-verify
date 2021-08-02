@@ -33,8 +33,8 @@ template Montgomery(w, nb) {
         temps[nb] = temp & lo_64_bit_var;
         temps[nb + 1] = temp >> 64;
 
-        var m = (temps[0] * monty_prime[0]) % (2 << 63);
-        carry = loBitsNum(m);
+        var m = (temps[0] * monty_prime[0]) % (1 << 64);
+        carry = m & lo_64_bit_var;
 
         for (var k = 1; k < nb; k++) {
             temp = temps[k] + m * modulus[k] + carry;
@@ -47,6 +47,7 @@ template Montgomery(w, nb) {
         temps[nb - 1] = temp & lo_64_bit_var;
         temps[nb] = temp >> 64 + temps[nb + 1];
     }
+
 
     for (var i = 0; i < nb + 1; i++) {
         temps[i] --> out[i];
