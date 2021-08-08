@@ -1,7 +1,7 @@
 
 
 template mont_mul(w, nb) {
-    signal input a[nb];
+    signal input pre_compute_a[nb];
     signal input b[nb];
     signal input modulus[nb];
 
@@ -11,8 +11,17 @@ template mont_mul(w, nb) {
 
     component montPr = mont_pr_cios(w, nb);
 
+    for (var i = 0; i < nb; i++) {
+        montPr.x[i] <-- pre_compute_a[i];
+        montPr.y[i] <-- b[i];
+        montPr.modulus[i] <-- modulus[i];
 
+        montPr.m0inv <-- m0inv;
+    }
 
+    for (var i = 0; i < nb; i++) {
+        out[i] <-- montPr.out[i];
+    }
 }
 
 // Montgomery modular multiplication. CIOS alg

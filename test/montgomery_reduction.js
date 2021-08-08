@@ -12,7 +12,7 @@ describe("montgomery reduction 64bits/4words", function () {
 
     let circuit;
     before(async () => {
-        circuit = await tester(path.join(__dirname, "circuits", "montgomery_reduction.circom"));
+        circuit = await tester(path.join(__dirname, "circuits", "montgomery.circom"));
     });
 
     it("64bits/4words. and mod = 52435875175126190479447740508185965837690552500527637822603658699938581184513", async () => {
