@@ -4,28 +4,38 @@ const snarkjs = require("snarkjs");
 
 const assert = chai.assert;
 
-function splitToWords(x, w, n, name) {
+function splitToArray(x, w, n) {
     let t = bigInt(x);
     w = bigInt(w);
     n = bigInt(n);
-    const words = {};
+    var words = new Array(w);
     for (let i = 0; i < n; ++i) {
-        words[`${name}[${i}]`] = `${t.mod(bigInt(2).pow(w))}`;
+        // words[`${name}[${i}]`] = `${t.mod(bigInt(2).pow(w))}`;
+        words[i] = `${t.mod(bigInt(2).pow(w))}`;
         t = t.divide(bigInt(2).pow(w));
     }
     if (!t.isZero()) {
         throw `Number ${x} does not fit in ${w * n} bits`;
     }
+
+    let end_index = n - 1;
+    for (let i = n - 1; i >= 0; i--) {
+        if (words[i] == '0') {
+            continue;
+        }
+
+        words[end_index] = words[i];
+        if (end_index != i) {
+            words[i] = '0'; 
+        }
+        
+        end_index--;
+    }
+
     return words;
 }
 
-function assertWitnessHas(circuit, witness, name, x, w, b) {
-    let words = splitToWords(x, w, b, `main.${name}`);
-    for (let [signal, value] of Object.entries(words)) {
-        assert(witness[circuit.signalName2Idx[signal]].equals(snarkjs.bigInt(value)), 
-            `${signal} expected to be ${(snarkjs.bigInt(value))} but was ${witness[circuit.signalName2Idx[signal]]}`);
-    }
-}
+
 
 const extractExpr = (f) => {
     const src = f.toString();
@@ -35,6 +45,5 @@ const extractExpr = (f) => {
 
 module.exports = {
     extractExpr,
-    assertWitnessHas,
-    splitToWords,
+    splitToArray,
 };
