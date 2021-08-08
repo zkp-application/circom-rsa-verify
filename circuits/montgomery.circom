@@ -1,5 +1,7 @@
 
-
+// montrygomery production alg. Currently 
+// w = 64
+// nb is the length of the number input 
 template mont_mul(w, nb) {
     signal input pre_compute_a[nb];
     signal input b[nb];
