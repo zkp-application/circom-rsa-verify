@@ -11,7 +11,7 @@ template mont_mul(w, nb) {
 
     signal output out [nb];
 
-    component montPr = mont_pr_cios(w, nb);
+    component montPr = mont_cios(w, nb);
 
     for (var i = 0; i < nb; i++) {
         montPr.x[i] <-- pre_compute_a[i];
@@ -29,7 +29,7 @@ template mont_mul(w, nb) {
 // Montgomery modular multiplication. CIOS alg
 // Souce paper from https://www.microsoft.com/en-us/research/wp-content/uploads/1998/06/97Acar.pdf
 // (x * y) mod modulus
-template mont_pr_cios(w, nb) {
+template mont_cios(w, nb) {
     signal input x[nb];
     signal input y[nb];
     signal input modulus[nb];
@@ -92,7 +92,6 @@ template mont_pr_cios(w, nb) {
 }
 
 // a > modulus ? a - modulus : a;
-// 
 template normalize(w, nb) {
     signal input a[nb];
     signal input modulus[nb];
@@ -123,7 +122,6 @@ template normalize(w, nb) {
         }
     } else {
          // out =  a - m;
-
         for (var i = 0; i< nb; i++) {
             temp = a[i];
 

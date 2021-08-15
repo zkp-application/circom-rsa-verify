@@ -28,7 +28,7 @@ describe("montgomery reduction 64bits/4words", function () {
                 y: splitToArray(bigInt("100"), 64, 4),
                 // 52435875175126190479447740508185965837690552500527637822603658699938581184513
                 modulus: modulus,
-                m0inv: "18446744069414584319",
+                m0inv: m0inv,
             },
             output: { out: [0, 0, 10000, 0] },
         }, {
