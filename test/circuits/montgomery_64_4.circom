@@ -1,3 +1,3 @@
 include "../../circuits/montgomery.circom"
 
-component main = mont_pr_cios(64, 4);
+component main = mont_cios(64, 4);
