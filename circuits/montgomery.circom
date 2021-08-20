@@ -1,4 +1,3 @@
-
 // montrygomery production alg. Currently 
 // w = 64
 // nb is the length of the number input 
@@ -75,19 +74,21 @@ template mont_cios(w, nb) {
 
         temp = temps[nb] + C;
 
+        C = temp >> 64;
+
         temps[nb - 1] = temp & lo_64_bit_var;
         temps[nb] = C + temps[nb + 1];
     }
 
-    component normal = normalize(w, nb);
-    for (var i = 0; i< nb; i++) {
-        normal.a[i] <-- temps[i];
-        normal.modulus[i] <-- modulus[i];
-    }
+    // component normal = normalize(w, nb);
+    // for (var i = 0; i< nb; i++) {
+    //     normal.a[i] <-- temps[i];
+    //     normal.modulus[i] <-- modulus[i];
+    // }
 
 
     for (var i = 0; i < nb; i++) {
-        out[i] <-- normal.out[i];
+        out[i] <-- temps[i];
     }
 }
 
