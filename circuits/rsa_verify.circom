@@ -1,21 +1,29 @@
-include "./pow_mod.circom";
-include "../circom-bigint/circomlib/circuits/bitify.circom"
+include "./mont_exp.circom";
+include "../circomlib/circuits/bitify.circom"
 
 // Pkcs1v15 + Sha256
 // exp 65537
-template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
-    signal input exp[nb];
-    signal input sign[nb];
-    signal input modulus[nb];
+template RsaVerifyPkcs1v15(w, nb, hashLen) {
+    // p_a = sign * 2 ^ (w * nb) mod p
+    signal input p_a[nb];
+    // p_A = 2 ^ (w * nb) mod p
+    signal input p_A[nb];
+    signal input exp;
+    // modulus
+    signal input p[nb];
+    signal input m0ninv;
 
     signal input hashed[hashLen];
 
     // sign ** exp mod modulus
-    component pm = PowerModv2(w, nb, e_bits);
+    component pm = mont_exp(w, nb);
+    pm.exp <-- exp;
+    pm.m0ninv <-- m0ninv;
+    
     for (var i  = 0; i < nb; i++) {
-        pm.base[i] <-- sign[i];
-        pm.exp[i] <-- exp[i];
-        pm.modulus[i] <-- modulus[i];
+        pm.p_a[i] <-- p_a[i];
+        pm.p_A[i] <-- p_A[i];
+        pm.p[i] <-- p[i];
     }
 
     // 1. Check hashed data

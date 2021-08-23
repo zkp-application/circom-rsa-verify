@@ -1,8 +1,5 @@
 const bigInt = require("big-integer");
-const chai = require("chai");
-const snarkjs = require("snarkjs");
 
-const assert = chai.assert;
 
 function splitToArray(x, w, n) {
     let t = bigInt(x);
@@ -16,20 +13,6 @@ function splitToArray(x, w, n) {
     }
     if (!t.isZero()) {
         throw `Number ${x} does not fit in ${w * n} bits`;
-    }
-
-    let end_index = n - 1;
-    for (let i = n - 1; i >= 0; i--) {
-        if (words[i] == '0') {
-            continue;
-        }
-
-        words[end_index] = words[i];
-        if (end_index != i) {
-            words[i] = '0'; 
-        }
-        
-        end_index--;
     }
 
     return words;
