@@ -22,5 +22,3 @@ Circuit infomation
 1. [Montgomery modular multiplication](https://en.wikipedia.org/wiki/Montgomery_modular_multiplication)
 
 2. [Arithmetic of Finite Fields](https://www.researchgate.net/publication/319538235_Arithmetic_of_Finite_Fields)
-
-

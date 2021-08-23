@@ -13,15 +13,15 @@ template mont_mul(w, nb) {
     component montPr = mont_cios(w, nb);
 
     for (var i = 0; i < nb; i++) {
-        montPr.x[i] <-- pre_compute_a[i];
-        montPr.y[i] <-- b[i];
-        montPr.modulus[i] <-- modulus[i];
+        montPr.x[i] <== pre_compute_a[i];
+        montPr.y[i] <== b[i];
+        montPr.modulus[i] <== modulus[i];
 
-        montPr.m0inv <-- m0inv;
+        montPr.m0inv <== m0inv;
     }
 
     for (var i = 0; i < nb; i++) {
-        out[i] <-- montPr.out[i];
+        montPr.out[i] ==> out[i];
     }
 }
 
@@ -41,8 +41,6 @@ template mont_cios(w, nb) {
     for (var i = 0; i < nb +2 ;i ++) {
         temps[i] = 0;
     }
-    
-   
     
     var temp = 0;
     // 0b1111111111111111111111111111111111111111111111111111111111111111
@@ -88,12 +86,13 @@ template mont_cios(w, nb) {
         temps[nb] = C + temps[nb + 1];
     }
 
-     component normal = normalize(w, nb);
-     normal.a_carry <-- temps[nb];
-     for (var i = 0; i< nb; i++) {
-         normal.a[i] <-- temps[i];
-         normal.modulus[i] <-- modulus[i];
-     }
+    component normal = normalize(w, nb);
+    normal.a_carry <-- temps[nb];
+     
+    for (var i = 0; i < nb; i++) {
+        normal.a[i] <-- temps[i];
+        normal.modulus[i] <-- modulus[i];
+    }
 
 
     for (var i = 0; i < nb; i++) {
@@ -157,7 +156,7 @@ template normalize(w, nb) {
     }
 
    for (var i = 0; i< nb; i++) {
-        out[i] <-- t[i];
+        out[i] <== t[i];
    }
 }
 

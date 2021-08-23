@@ -40,6 +40,7 @@ describe("Rsa pkcs1v15 verify", () => {
             m0ninv: m0ninv,
             hashed: splitToArray(hashed, 64, 4),
         };
+        
         const witness = circuit.calculateWitness(input, true);
     });
 
