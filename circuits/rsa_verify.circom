@@ -17,13 +17,13 @@ template RsaVerifyPkcs1v15(w, nb, hashLen) {
 
     // sign ** exp mod modulus
     component pm = mont_exp(w, nb);
-    pm.exp <-- exp;
-    pm.m0ninv <-- m0ninv;
+    pm.exp <== exp;
+    pm.m0ninv <== m0ninv;
     
     for (var i  = 0; i < nb; i++) {
-        pm.p_a[i] <-- p_a[i];
-        pm.p_A[i] <-- p_A[i];
-        pm.p[i] <-- p[i];
+        pm.p_a[i] <== p_a[i];
+        pm.p_A[i] <== p_A[i];
+        pm.p[i] <== p[i];
     }
 
     // 1. Check hashed data
