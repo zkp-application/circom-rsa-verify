@@ -6,62 +6,71 @@ include "./montgomery.circom"
 template mont_exp(w, nb) {
     signal input p_a[nb];
     signal input p_A[nb];
-
     signal input exp;
-    signal input m0inv;
-    signal input modulus[nb];
+    signal input p[nb];
 
+    signal input m0ninv;
 
     signal output out[nb];
 
+    // 0b10000000000000001
     exp === 65537;
-    
-    component muls[19];
-    for (var i = 0; i< 19; i++) {
-        muls[i] = mont_cios(w, nb);
 
-        muls[i].m0inv <-- m0inv;
+    var e_bits = 17;
+
+    component montPrs[19];
+
+    for (var i = 0; i < e_bits + 2 ; i++) {
+        montPrs[i] = mont_cios(w, nb);
+        montPrs[i].m0inv <-- m0ninv;
 
         for (var j = 0; j < nb; j++) {
-            muls[i].modulus[j] <-- modulus[j];
+            montPrs[i].modulus[j] <-- p[j];
         }
+    }
 
+    var mont_index = 0;
+    for (var i = 0; i < e_bits; i++) {
         if (i == 0) {
             for (var j = 0; j < nb; j++) {
-                muls[i].x[j] <-- p_A[j];
-                muls[i].y[j] <-- p_A[j];
-            }
-        } else if (i == 1 || i == 18) {
-            for (var j = 0; j < nb; j++) {
-                muls[i].x[j] <-- muls[i - 1].out[j];
-                muls[i].y[j] <-- p_a[j];
+                montPrs[mont_index].x[j] <-- p_A[j];
+                montPrs[mont_index].y[j] <-- p_A[j];
             }
         } else {
             for (var j = 0; j < nb; j++) {
-                muls[i].x[j] <-- muls[i - 1].out[j];
-                muls[i].y[j] <-- muls[i - 1].out[j];
-            } 
+                montPrs[mont_index].x[j] <-- montPrs[mont_index - 1].out[j];
+                montPrs[mont_index].y[j] <-- montPrs[mont_index - 1].out[j];
+            }
+        }
+
+        mont_index ++;
+
+        if (i == 0 || i == (e_bits - 1)) {
+            for (var j = 0; j < nb; j++) {
+                montPrs[mont_index].x[j] <-- montPrs[mont_index - 1].out[j];
+                montPrs[mont_index].y[j] <-- p_a[j];
+            }
+
+            mont_index ++;
         }
     }
 
-    // A <- MontPr(p_A, 1);
-    component result_mul = mont_cios(w, nb);
+    component resultMontPr = mont_cios(w, nb);
 
-    result_mul.m0inv <-- m0inv;
+    resultMontPr.m0inv <-- m0ninv;
 
-    for (var j = 0; j < nb; j++) {
-        result_mul.modulus[j] <-- modulus[j];
-        result_mul.x[j] <-- muls[18].out[j];
-
-        if (j == 0) {
-            result_mul.y[j] <-- 1;
-        }else {
-            result_mul.y[j] <-- 0;
+    for (var i = 0; i < nb; i++) {
+        resultMontPr.modulus[i] <-- p[i];
+        resultMontPr.x[i] <-- montPrs[mont_index - 1].out[i];
+        var t = 0;
+        if (i == 0) {
+            t = 1;
         }
+
+        resultMontPr.y[i] <-- t;
     }
 
-
-    for (var i = 0; i< nb; i++) {
-        out[i] <-- result_mul.out[i];
+    for (var i = 0; i < nb; i ++) {
+        out[i] <-- resultMontPr.out[i];
     }
 }

@@ -8,7 +8,7 @@ function splitToArray(x, w, n) {
     var words = new Array(w);
     for (let i = 0; i < n; ++i) {
         // words[`${name}[${i}]`] = `${t.mod(bigInt(2).pow(w))}`;
-        words[n - 1 - i] = `${t.mod(bigInt(2).pow(w))}`;
+        words[i] = `${t.mod(bigInt(2).pow(w))}`;
         t = t.divide(bigInt(2).pow(w));
     }
     if (!t.isZero()) {
