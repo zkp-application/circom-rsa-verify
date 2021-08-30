@@ -1,3 +1,6 @@
+include "../circomlib/circuits/bitify.circom"
+include "./mul.circom"
+include "./sub.circom"
 // montrygomery production alg. Currently 
 // w = 64
 // nb is the length of the number input 
@@ -29,11 +32,14 @@ template mont_mul(w, nb) {
 // Souce paper from https://www.microsoft.com/en-us/research/wp-content/uploads/1998/06/97Acar.pdf
 // (x * y) mod modulus
 template mont_cios(w, nb) {
+    signal input x_raw[nb];
+
     signal input x[nb];
     signal input y[nb];
     signal input modulus[nb];
 
     signal input m0inv;
+
 
     signal output out[nb];
 
@@ -48,6 +54,7 @@ template mont_cios(w, nb) {
 
      // TODO: add constraint for (m0inv * modulus[0]) % (1 << w) ≡ -1
 
+    // Witness computation
     var C = 0;
     for (var i = 0; i < nb; i++) {
         C = 0;
@@ -86,6 +93,7 @@ template mont_cios(w, nb) {
         temps[nb] = C + temps[nb + 1];
     }
 
+    // verify
     component normal = normalize(w, nb);
     normal.a_carry <-- temps[nb];
      
@@ -94,10 +102,18 @@ template mont_cios(w, nb) {
         normal.modulus[i] <-- modulus[i];
     }
 
-
     for (var i = 0; i < nb; i++) {
-        out[i] <-- normal.out[i];
+        out[i] <== normal.out[i];
     }
+    
+    // Verify that the remainder and quotient are w-bits, n-chunks.
+    component prodDecomp[nb];
+    for (var i = 0; i < nb; i++) {
+        prodDecomp[i] = Num2Bits(w);
+        prodDecomp[i].in <== normal.out[i];
+    }
+
+    // TODO: constraints (x_raw * y) - out divisible modulus
 }
 
 // a > modulus ? a - modulus : a;
@@ -108,6 +124,7 @@ template normalize(w, nb) {
 
 
     signal output out[nb];
+    signal output has_sub;
 
     // check a greater than modulus
     var needSub = 2;
@@ -124,6 +141,8 @@ template normalize(w, nb) {
             }
         }
     }
+
+    has_sub <== 1;
     
 
     var borrow = 0;
@@ -136,7 +155,7 @@ template normalize(w, nb) {
     }
     var carry_v = 1 << w;
     
-    if (needSub == 1) {
+    if (needSub != 0) {
         for (var i = 0; i < nb; i++) {
             temp = a[i];
             if (i == nb - 1 && a_carry == 1) {
@@ -158,28 +177,13 @@ template normalize(w, nb) {
    for (var i = 0; i< nb; i++) {
         out[i] <== t[i];
    }
-}
 
-// return a - b
-function sub(a, b, nb, w) {
-    var borrow = 0;
-    var temp = 0;
-    var out[nb];
 
-    for (var i = 0; i< nb; i++) {
-        temp = a[i];
-        if (borrow == 1) {
-            temp--;
-        }
-        
-        if (((temp == 0) && (b[i] > 0 || borrow == 1)) || temp < b[i]) {
-            borrow = 1;
-            temp += 1 << (w + 1);
-        }
-
-        out[i] = temp - b[i];
-    }
-
-    return out;
+//   // TODO: conditions
+//   if (has_sub == 1) {
+//       // out + modulus = a
+//   }else {
+//       // out == a
+//   }
 }
 
