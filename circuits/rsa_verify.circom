@@ -13,9 +13,9 @@ template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
     // sign ** exp mod modulus
     component pm = PowerModv2(w, nb, e_bits);
     for (var i  = 0; i < nb; i++) {
-        pm.base[i] <-- sign[i];
-        pm.exp[i] <-- exp[i];
-        pm.modulus[i] <-- modulus[i];
+        pm.base[i] <== sign[i];
+        pm.exp[i] <== exp[i];
+        pm.modulus[i] <== modulus[i];
     }
 
     // 1. Check hashed data
@@ -31,7 +31,7 @@ template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
     pm.out[5] === 938447882527703397;
     // // remain 24 bit
     component num2bits_6 = Num2Bits(w);
-    num2bits_6.in <-- pm.out[6];
+    num2bits_6.in <== pm.out[6];
     var remainsBits[32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0];
     for (var i = 0; i < 32; i++) {
         num2bits_6.out[i] === remainsBits[31 - i];
