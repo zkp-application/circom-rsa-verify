@@ -11,8 +11,6 @@ template AsymmetricPolynomialMultiplier(d0, d1) {
 
     // Output has degree less than `d`
     var d = d0 + d1 - 1;
-    var res = sss(in0, in1);
-    res[0] === 1;
     // Witness value.
     signal output out[d];
 

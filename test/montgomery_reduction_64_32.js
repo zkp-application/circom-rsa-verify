@@ -33,6 +33,7 @@ describe("montgomery reduction 64bits/32words.", function () {
         var testCases = [{
             description: "one word",
             input: {
+                x_raw: splitToArray(sign, 64, 32),
                 x: splitToArray(p_a, 64, 32),
                 y: splitToArray(sign, 64, 32),
                 modulus: splitToArray(n, 64, 32),

@@ -1,6 +1,7 @@
 include "../circomlib/circuits/bitify.circom"
-include "./mul.circom"
 include "./sub.circom"
+include "./mul.circom"
+include "./div.circom"
 // montrygomery production alg. Currently 
 // w = 64
 // nb is the length of the number input 
@@ -95,11 +96,11 @@ template mont_cios(w, nb) {
 
     // verify
     component normal = normalize(w, nb);
-    normal.a_carry <-- temps[nb];
+    normal.a_carry <== temps[nb];
      
     for (var i = 0; i < nb; i++) {
-        normal.a[i] <-- temps[i];
-        normal.modulus[i] <-- modulus[i];
+        normal.a[i] <== temps[i];
+        normal.modulus[i] <== modulus[i];
     }
 
     for (var i = 0; i < nb; i++) {
@@ -114,6 +115,36 @@ template mont_cios(w, nb) {
     }
 
     // TODO: constraints (x_raw * y) - out divisible modulus
+    component mul_xy = AsymmetricPolynomialMultiplier(nb, nb);
+    for (var i = 0; i < nb; i++) {
+        mul_xy.in0[i] <== x_raw[i];
+        mul_xy.in1[i] <== y[i];
+    }
+
+    var doubleN = 2 * nb;
+
+    component divisible = Divisible(w, doubleN);
+    for (var i = 0; i < doubleN - 1; i++) {
+        divisible.a[i] <== mul_xy.out[i];
+    }
+
+    divisible.a[doubleN - 1] <== 0;
+
+    for (var i = 0; i < nb; i++) {
+        divisible.b[i] <== modulus[i];
+    }
+
+    for (var i = nb; i < doubleN; i++) {
+        divisible.b[i] <== 0;
+    }
+
+    for (var i = 0; i < nb; i++) {
+        divisible.remainder[i] <== out[i];
+    }
+
+    for (var i = nb; i < doubleN; i++) {
+        divisible.remainder[i] <== 0;
+    }
 }
 
 // a > modulus ? a - modulus : a;
@@ -124,14 +155,15 @@ template normalize(w, nb) {
 
 
     signal output out[nb];
-    signal output has_sub;
+
+    signal has_sub;
 
     // check a greater than modulus
     var needSub = 2;
     if (a_carry == 1) {
         needSub = 1;
     }else {
-        for (var i = nb - 1; i >= 0; i--) {
+        for (var i = nb - 1; i >= 0; i==) {
             if(a[i] > modulus[i] && needSub == 2) {
                 needSub = 1;
             }
@@ -143,7 +175,6 @@ template normalize(w, nb) {
     }
 
     has_sub <== 1;
-    
 
     var borrow = 0;
     var temp = 0;
@@ -177,13 +208,5 @@ template normalize(w, nb) {
    for (var i = 0; i< nb; i++) {
         out[i] <== t[i];
    }
-
-
-//   // TODO: conditions
-//   if (has_sub == 1) {
-//       // out + modulus = a
-//   }else {
-//       // out == a
-//   }
 }
 
