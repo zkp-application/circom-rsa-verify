@@ -1,4 +1,6 @@
-include "../circomlib/circuits/bitify.circom"
+pragma circom 2.0.0;
+
+include "../circomlib/circuits/bitify.circom";
 
 
 template Sub(w, n1, n2) {

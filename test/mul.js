@@ -2,17 +2,17 @@ const path = require("path");
 
 const bigInt = require("big-integer");
 const Scalar = require("ffjavascript").Scalar;
-const tester = require("circom").tester;
+const wasm_tester = require("circom_tester").wasm;
 
 const { splitToArray } = require("./util.js");
 
 
-describe("Montgomery exponent 64bits/32words111111", function () {
+describe("Polynomial Multiplier", function () {
     this.timeout(100000);
 
     let circuit;
     before(async () => {
-        circuit = await tester(path.join(__dirname, "circuits", "mul.circom"));
+        circuit = await wasm_tester(path.join(__dirname, "circuits", "mul.circom"));
     });
 
     it("64bits/1words. Polynomial Multiplier", async () => {

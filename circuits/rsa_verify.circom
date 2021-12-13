@@ -1,29 +1,23 @@
-include "./mont_exp.circom";
-include "../circomlib/circuits/bitify.circom"
+pragma circom 2.0.0;
+
+include "../circomlib/circuits/bitify.circom";
+include "./power_mod.cicom";
 
 // Pkcs1v15 + Sha256
 // exp 65537
-template RsaVerifyPkcs1v15(w, nb, hashLen) {
-    // p_a = sign * 2 ^ (w * nb) mod p
-    signal input p_a[nb];
-    // p_A = 2 ^ (w * nb) mod p
-    signal input p_A[nb];
-    signal input exp;
-    // modulus
-    signal input p[nb];
-    signal input m0ninv;
+template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
+    signal input exp[nb];
+    signal input sign[nb];
+    signal input modulus[nb];
 
     signal input hashed[hashLen];
 
     // sign ** exp mod modulus
-    component pm = mont_exp(w, nb);
-    pm.exp <== exp;
-    pm.m0ninv <== m0ninv;
-    
+    component pm = PowerModv2(w, nb, e_bits);
     for (var i  = 0; i < nb; i++) {
-        pm.p_a[i] <== p_a[i];
-        pm.p_A[i] <== p_A[i];
-        pm.p[i] <== p[i];
+        pm.base[i] <== sign[i];
+        pm.exp[i] <== exp[i];
+        pm.modulus[i] <== modulus[i];
     }
 
     // 1. Check hashed data
@@ -39,7 +33,7 @@ template RsaVerifyPkcs1v15(w, nb, hashLen) {
     pm.out[5] === 938447882527703397;
     // // remain 24 bit
     component num2bits_6 = Num2Bits(w);
-    num2bits_6.in <-- pm.out[6];
+    num2bits_6.in <== pm.out[6];
     var remainsBits[32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0];
     for (var i = 0; i < 32; i++) {
         num2bits_6.out[i] === remainsBits[31 - i];
@@ -57,3 +51,4 @@ template RsaVerifyPkcs1v15(w, nb, hashLen) {
     // 0b1111111111111111111111111111111111111111111111111
     pm.out[31] === 562949953421311;
 }
+
