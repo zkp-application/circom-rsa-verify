@@ -1,12 +1,11 @@
 pragma circom 2.0.0;
-
-include "../circomlib/circuits/bitify.circom";
-include "mul.circom";
+ 
+include "../circom-ecdsa/circuits/bigint.circom";
 // w = 32
 // base ** exp mod modulus
 // nb is the length of the input number
 // exp = 65537
-template PowerModv2(w, nb, e_bits) {
+template PowerMod(w, nb, e_bits) {
     signal input base[nb];
     signal input exp[nb];
     signal input modulus[nb];
@@ -16,10 +15,10 @@ template PowerModv2(w, nb, e_bits) {
    
     component muls[e_bits + 2];
     for (var i = 0; i < e_bits + 2; i++) {
-        muls[i] = mul_mod(w, nb);
+        muls[i] = BigMultModP(w, nb);
         // modulus params
         for (var j = 0; j < nb; j++) {
-            muls[i].modulus[j] <== modulus[j];
+            muls[i].p[j] <== modulus[j];
         }
     }
 
