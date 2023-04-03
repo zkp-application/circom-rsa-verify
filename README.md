@@ -19,15 +19,14 @@ RSA verify: pkcs1v15/sha256/2048 bits key
 
 Circuit infomation
 
-* Curve: bn-128
-* Wires: 103
-* Constraints: 65
-* Public Inputs: 102
-* Memory consumption: 120M+
-* Time consumption: 40ms
+* snarkJS: Curve: bn-128
+* snarkJS: # of Wires: 530676
+* snarkJS: # of Constraints: 536212
+* snarkJS: # of Private Inputs: 0
+* snarkJS: # of Public Inputs: 100
+* snarkJS: # of Labels: 583860
+* snarkJS: # of Outputs: 0
 
 ## Ref
-
-1. [Montgomery modular multiplication](https://en.wikipedia.org/wiki/Montgomery_modular_multiplication)
 
 2. [Arithmetic of Finite Fields](https://www.researchgate.net/publication/319538235_Arithmetic_of_Finite_Fields)
