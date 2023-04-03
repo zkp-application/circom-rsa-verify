@@ -1,10 +1,11 @@
-include "../circom-bigint/circomlib/circuits/bitify.circom"
-include "../circom-bigint/circuits/mult.circom"
+pragma circom 2.0.0;
+ 
+include "../circom-ecdsa/circuits/bigint.circom";
 // w = 32
 // base ** exp mod modulus
 // nb is the length of the input number
 // exp = 65537
-template PowerModv2(w, nb, e_bits) {
+template PowerMod(w, nb, e_bits) {
     signal input base[nb];
     signal input exp[nb];
     signal input modulus[nb];
@@ -14,10 +15,10 @@ template PowerModv2(w, nb, e_bits) {
    
     component muls[e_bits + 2];
     for (var i = 0; i < e_bits + 2; i++) {
-        muls[i] = MultiplierReducer(w, nb);
+        muls[i] = BigMultModP(w, nb);
         // modulus params
         for (var j = 0; j < nb; j++) {
-            muls[i].modulus[j] <== modulus[j];
+            muls[i].p[j] <== modulus[j];
         }
     }
 
@@ -38,8 +39,8 @@ template PowerModv2(w, nb, e_bits) {
                }
            } else {
                for(var j = 0; j < nb; j++) {
-                   muls[muls_index].a[j] <== muls[result_index].prod[j];
-                   muls[muls_index].b[j] <== muls[base_index].prod[j];
+                   muls[muls_index].a[j] <== muls[result_index].out[j];
+                   muls[muls_index].b[j] <== muls[base_index].out[j];
                }
            }
             result_index = muls_index;
@@ -53,8 +54,8 @@ template PowerModv2(w, nb, e_bits) {
              }
         } else {
              for (var j = 0; j < nb; j++) {
-                 muls[muls_index].a[j] <== muls[base_index].prod[j];
-                 muls[muls_index].b[j] <== muls[base_index].prod[j];
+                 muls[muls_index].a[j] <== muls[base_index].out[j];
+                 muls[muls_index].b[j] <== muls[base_index].out[j];
              }
         }
         base_index = muls_index;
@@ -62,8 +63,6 @@ template PowerModv2(w, nb, e_bits) {
     }
 
     for (var i = 0; i < nb; i++) {
-        out[i] <== muls[result_index].prod[i];
+        out[i] <== muls[result_index].out[i];
     }
 }
-
-

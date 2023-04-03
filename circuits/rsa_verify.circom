@@ -1,5 +1,22 @@
+pragma circom 2.0.0;
+
 include "./pow_mod.circom";
-include "../circom-bigint/circomlib/circuits/bitify.circom"
+
+template NumToBits(n) {
+    signal input in;
+    signal output out[n];
+    var lc1=0;
+
+    var e2=1;
+    for (var i = 0; i<n; i++) {
+        out[i] <-- (in >> i) & 1;
+        out[i] * (out[i] -1 ) === 0;
+        lc1 += out[i] * e2;
+        e2 = e2+e2;
+    }
+
+    lc1 === in;
+}
 
 // Pkcs1v15 + Sha256
 // exp 65537
@@ -11,7 +28,7 @@ template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
     signal input hashed[hashLen];
 
     // sign ** exp mod modulus
-    component pm = PowerModv2(w, nb, e_bits);
+    component pm = PowerMod(w, nb, e_bits);
     for (var i  = 0; i < nb; i++) {
         pm.base[i] <== sign[i];
         pm.exp[i] <== exp[i];
@@ -30,7 +47,7 @@ template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
     pm.out[4] === 217300885422736416;
     pm.out[5] === 938447882527703397;
     // // remain 24 bit
-    component num2bits_6 = Num2Bits(w);
+    component num2bits_6 = NumToBits(w);
     num2bits_6.in <== pm.out[6];
     var remainsBits[32] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0];
     for (var i = 0; i < 32; i++) {
@@ -49,3 +66,4 @@ template RsaVerifyPkcs1v15(w, nb, e_bits, hashLen) {
     // 0b1111111111111111111111111111111111111111111111111
     pm.out[31] === 562949953421311;
 }
+
