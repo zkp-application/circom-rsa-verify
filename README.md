@@ -8,7 +8,7 @@ Currently supported pkcs1v15 + sha256 and exponent is 65537. The Montgomery Expo
 Running circuits test cases
 
 ```sh
-git submodule update --init --recursive; npm i; npm test
+git submodule update --init --recursive; cd circom-ecdsa; npm i; cd ..; npm i; npm test
 ```
 
 ## Circuits Benchmark
